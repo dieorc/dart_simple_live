@@ -2,6 +2,14 @@ name: build-ios-only
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v1.0.0)"
+        required: true
+        default: "ios-latest"
+
+permissions:
+  contents: write
 
 jobs:
   build-ios:
@@ -45,3 +53,11 @@ jobs:
         with:
           name: ios
           path: simple_live_app/build/ios/iphoneos/ios_no_sign.ipa
+
+      - name: Publish to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          files: simple_live_app/build/ios/iphoneos/ios_no_sign.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
